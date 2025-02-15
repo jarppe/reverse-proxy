@@ -5,7 +5,7 @@ on:
       - main
 
 env:
-  IMAGE: ghcr.io/jarppe/reverse-proxy
+  IMAGE: jarppe/reverse-proxy
 
 jobs:
   build:
