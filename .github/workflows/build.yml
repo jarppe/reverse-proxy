@@ -1,0 +1,39 @@
+name: build
+on:
+  push:
+    branches:
+      - main
+
+env:
+  IMAGE: ghcr.io/jarppe/reverse-proxy
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - name: Build ID and date
+        run: |
+          echo "build_date=$(date --iso-8601=seconds)" >> "$GITHUB_ENV"
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          platforms: linux/arm64,linux/amd64
+          push: true
+          cache-from: type=registry,ref=${{ env.IMAGE }}:latest
+          cache-to: type=inline
+          labels: |
+            build_date=${{ env.build_date }}
+            build_id=${{ env.GITHUB_RUN_ID }}
+          tags: |
+            ${{ env.IMAGE }}:latest
+            ${{ env.IMAGE }}:1.0

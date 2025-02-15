@@ -1,0 +1,11 @@
+*
+
+!.github
+!.github/**
+!.dockerignore
+!.gitignore
+!90-set-resolver.sh
+!bb.edn
+!Dockerfile
+!nginx.conf.template
+!README.md

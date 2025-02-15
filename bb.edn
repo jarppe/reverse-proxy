@@ -1,0 +1,47 @@
+{:paths ["bb"]
+ :tasks {:requires ([babashka.process :as p])
+         :init {:task (do (def image           "jarppe/reverse-proxy")
+                          (def image-dev       (str image ":dev"))
+                          (def image-dist      (str image ":latest"))
+                          (def image-dist-arch "linux/arm64,linux/amd64"))}
+
+         dev:build {:doc "Build local image for testing"
+                    :task (p/exec "docker build"
+                                  "--tag" image-dev
+                                  ".")}
+
+         dev:run {:doc "Run local test image"
+                  :task (p/exec "docker run"
+                                "--name" "nginx"
+                                "--rm"
+                                "--init"
+                                "--network" "host"
+                                image-dev)}
+
+         dev:sh {:doc "Run sh in local test image"
+                 :task (p/exec "docker run"
+                               "--name" "nginx"
+                               "--rm"
+                               "--init"
+                               "--interactive"
+                               "--tty"
+                               "--network" "host" 
+                               image-dev
+                               "sh")}
+
+         dist:build {:doc "Build distribution image"
+                     :task (p/exec "docker build"
+                                   "--tag" image-dist
+                                   "--platform" image-dist-arch
+                                   ".")}
+
+         dist:run {:doc "Run distribution image"
+                   :task (p/exec "docker run"
+                                 "--rm"
+                                 "--init"
+                                 "--network" "host"
+                                 image-dist)}
+
+         dist:push {:doc "Push distribtion image to docker hub"
+                    :task (p/exec "docker push"
+                                  image-dist)}}}

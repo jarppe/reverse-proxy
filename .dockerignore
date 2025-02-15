@@ -1,0 +1,3 @@
+*
+!nginx.conf.template
+!90-set-resolver.sh
